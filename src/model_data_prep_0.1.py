@@ -10,7 +10,6 @@ Python 3.7.6
 
 
 # Import necessary packages
-import os
 import glob
 import pandas as pd
 import sys
@@ -29,21 +28,21 @@ acc_dfs = []
 
 # Loop through file paths to data and load file from csv to dataframe
 for i in acc_paths:
-    acc_dfs.append(pd.read_csv(i))
+    acc_dfs.append(pd.read_csv(i, index_col=0))
 
 # Intialize empty list for loop
 gyro_dfs = []
 
 # Loop through file paths to data and load file from csv to dataframe
 for i in gyro_paths:
-    gyro_dfs.append(pd.read_csv(i))
+    gyro_dfs.append(pd.read_csv(i, index_col=0))
   
 # Intialize empty list for loop
 magn_dfs = []
 
 # Loop through file paths to data and load file from csv to dataframe
 for i in gyro_paths:
-    magn_dfs.append(pd.read_csv(i))
+    magn_dfs.append(pd.read_csv(i, index_col=0))
 
 # Clean up environment
 del i, acc_paths, gyro_paths, magn_paths
@@ -57,9 +56,6 @@ for i in acc_dfs:
     i = i.loc[1000:(len(i)-1001)]
     acc_df = acc_df.append(i, ignore_index=True)
 
-# Drop uneeded column
-acc_df = acc_df.drop(['Unnamed: 0'], axis=1)
-
 # Initialize empty data frame for loop
 gyro_df = pd.DataFrame()
 
@@ -69,9 +65,6 @@ for i in gyro_dfs:
     i = i.loc[1000:(len(i)-1001)]
     gyro_df = gyro_df.append(i, ignore_index=True)
 
-# Drop uneeded column
-gyro_df = gyro_df.drop(['Unnamed: 0'], axis=1)
-
 # Initialize empty data frame for loop
 magn_df = pd.DataFrame()
 
@@ -80,9 +73,6 @@ magn_df = pd.DataFrame()
 for i in magn_dfs:
     i = i.loc[1000:(len(i)-1001)]
     magn_df = magn_df.append(i, ignore_index=True)
-
-# Drop uneeded column
-magn_df = magn_df.drop(['Unnamed: 0'], axis=1)
 
 # Split source file path information to extract label, sensor type and collection date
 acc_df[['delete', 'folder', 'label', 'sensor_type', 'collection_date', 'file']] = acc_df['source'].str.split('/', expand=True)
@@ -154,6 +144,9 @@ gyro_df.to_csv('./model_data/gyro_df.csv')
 magn_df.to_csv('./model_data/magn_df.csv')
 acc_gyro_data.to_csv('./model_data/acc_gyro_data.csv')
 all_sensor_data.to_csv('./model_data/all_sensor_data.csv')
+
+# Clean up environment
+del acc_df, acc_gyro_data, all_sensor_data, gyro_df, magn_df
 
 # End timer
 stop = timeit.default_timer()
