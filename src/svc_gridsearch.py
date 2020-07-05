@@ -97,9 +97,13 @@ df_scaled.columns = df_scaled_columns
 # Add original index to scaled dataframe
 df_scaled.index = df.index
 
+# Set sample size for training
+df_scaled_sample = df_scaled.head(10000)
+targets_sample = targets.head(10000)
+
 # Create training and testing data with 20% of data for training
-X_train, X_test, y_train, y_test = train_test_split(df_scaled, 
-                                                    targets, 
+X_train, X_test, y_train, y_test = train_test_split(df_scaled_sample, 
+                                                    targets_sample, 
                                                     test_size= 0.20)
 
 # Create regularization parameters
@@ -154,15 +158,19 @@ predictions = model.predict(X_test)
 # Create confusion matrix from predictions and testing targets
 predictions_confusion_matrix = pd.DataFrame(confusion_matrix(y_test, predictions))
 
+# Add index from encoding key to confusion matrix
 predictions_confusion_matrix.index = encoding_key.sort_values('label_code')['label']
 
+# Add column names from encoding key to confusion matrix
 predictions_confusion_matrix.columns = list(encoding_key.sort_values('label_code')['label'])
 
+# Export confusion matric to csv
 predictions_confusion_matrix.to_csv('./models/svc_gridsearch/clf.best_estimator_/predictions_confusion_matrix.csv')
 
 # Get model accuracy on testing data
 test_accuracy = accuracy_score(y_test, predictions)
-np.savetxt('./models/svc_gridsearch/clf.best_estimator_/test_accuracy.txt', np.atleast_1d(test_accuracy))
+np.savetxt('./models/svc_gridsearch/clf.best_estimator_/test_accuracy.txt',
+           np.atleast_1d(test_accuracy))
 
 #predictions_proba = model.predict_proba(X_test)[:,1]
 
@@ -194,7 +202,8 @@ results = results.merge(encoding_key,
 results = results.merge(encoding_key,
                         left_on='predictions',
                         right_on='label_code',
-                        suffixes=(None, '_predictions')).drop('label_code_predictions', axis=1)
+                        suffixes=(None, '_predictions')).drop('label_code_predictions', 
+                                                              axis=1)
 
 # Set index to original index
 results = results.set_index(['timestamp', 'index'])
@@ -205,10 +214,10 @@ results['error'] = results['label'] != results['label_predictions']
 results.to_csv('./models/svc_gridsearch/clf.best_estimator_/results.csv')
 
 # Clean up environment
-del Cs, X_test, X_train, clf, clf_results_df, df, df_scled, df_scled columns
-del encoding_key, file, i, model, model_name, parameters, predictions
-del predictions_confusion_matrix, results, scaler, svc, targets, test_accuracy
-del total, y_test, y_trian
+#del Cs, X_test, X_train, clf, clf_results_df, df, df_scaled, df_scaled_columns
+#del encoding_key, file, i, model, model_name, parameters, predictions
+#del predictions_confusion_matrix, results, scaler, svc, targets, test_accuracy
+#del y_test, y_train, total_models, encoder, df_scaled_sample, targets_sample
 
 # End timer
 stop = timeit.default_timer()
