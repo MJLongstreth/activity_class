@@ -1,0 +1,5 @@
+label,prone,sit,stand,walk
+prone,4807,0,0,0
+sit,0,4804,60,0
+stand,0,44,5049,2
+walk,0,0,8,5002
